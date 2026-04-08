@@ -333,7 +333,12 @@ Create all files following the structure above. Use the examples in this skill's
 `examples/` directory as the reference for code style.
 
 ### Step 5: Test
-Delegate to the **test-writer** agent to create tests for the new resource.
+
+Delegate to the **test-writer** agent with two tasks:
+
+**Behat mode:** write a `.feature` file and step definitions for the new resource, run `vendor/bin/behat --suite=api`, confirm scenarios fail.
+
+**TDD mode:** write failing PHPUnit tests for Actions and Controllers, run `php artisan test` (Laravel) or `vendor/bin/phpunit` (Symfony/agnostic), confirm tests fail.
 
 ### Step 6: Verify
 Run `php artisan test --filter=<Resource>` to confirm everything passes.

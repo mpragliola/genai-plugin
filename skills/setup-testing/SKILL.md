@@ -111,6 +111,7 @@ Write the following files. Do not overwrite any file that already exists — ski
 **Laravel and agnostic (same content):**
 ```yaml
 parameters:
+  # Update app_url to match your APP_URL env var (e.g. http://localhost:8000)
   app_url: "http://localhost"
 default:
   suites:
@@ -302,6 +303,8 @@ class ApiContext extends FeatureContext
 Create empty placeholder files so git tracks the directories:
 - `features/unit/.gitkeep`
 - `features/api/.gitkeep`
+
+> **Note:** Behat autoloads all PHP files in `features/bootstrap/` by convention — no explicit `autoload` key is needed in `behat.yml` under standard configuration. If your project uses a custom autoloader that excludes this path, add `autoload: { "": "%paths.base%/features/bootstrap" }` to your `behat.yml`.
 
 ## Step 4: Report
 
