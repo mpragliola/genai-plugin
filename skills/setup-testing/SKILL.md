@@ -110,6 +110,8 @@ Write the following files. Do not overwrite any file that already exists — ski
 
 **Laravel and agnostic (same content):**
 ```yaml
+parameters:
+  app_url: "http://localhost"
 default:
   suites:
     unit:
@@ -120,7 +122,7 @@ default:
       contexts: [ApiContext]
   extensions:
     Behat\MinkExtension:
-      base_url: "%env(APP_URL)%"
+      base_url: "%app_url%"
       sessions:
         default:
           browser_kit: ~
@@ -153,19 +155,28 @@ default:
 
 declare(strict_types=1);
 
-use Behat\Behat\Context\Context;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Behat\MinkExtension\Context\MinkContext;
 
-class FeatureContext implements Context
+class FeatureContext extends MinkContext
 {
-    use RefreshDatabase;
-
     protected \Illuminate\Foundation\Application $app;
 
     public function __construct()
     {
         $this->app = require __DIR__ . '/../../bootstrap/app.php';
         $this->app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+    }
+
+    /** @BeforeScenario */
+    public function beginTransaction(): void
+    {
+        $this->app->make('db')->beginTransaction();
+    }
+
+    /** @AfterScenario */
+    public function rollbackTransaction(): void
+    {
+        $this->app->make('db')->rollBack();
     }
 }
 ```
@@ -176,11 +187,11 @@ class FeatureContext implements Context
 
 declare(strict_types=1);
 
-use Behat\Behat\Context\Context;
+use Behat\MinkExtension\Context\MinkContext;
 use FriendsOfBehat\SymfonyExtension\Context\KernelAwareContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class FeatureContext implements Context, KernelAwareContext
+class FeatureContext extends MinkContext implements KernelAwareContext
 {
     private KernelInterface $kernel;
 
@@ -197,9 +208,9 @@ class FeatureContext implements Context, KernelAwareContext
 
 declare(strict_types=1);
 
-use Behat\Behat\Context\Context;
+use Behat\MinkExtension\Context\MinkContext;
 
-class FeatureContext implements Context
+class FeatureContext extends MinkContext
 {
 }
 ```
@@ -212,9 +223,7 @@ All frameworks (same file):
 
 declare(strict_types=1);
 
-use Behat\MinkExtension\Context\MinkContext;
-
-class ApiContext extends MinkContext
+class ApiContext extends FeatureContext
 {
     /**
      * Send an HTTP request via Mink's browserkit session.
@@ -275,14 +284,15 @@ class ApiContext extends MinkContext
      */
     private function resolveDotPath(array $data, string $path): mixed
     {
+        $current = $data;
         foreach (explode('.', $path) as $segment) {
-            if (!is_array($data) || !array_key_exists($segment, $data)) {
+            if (!is_array($current) || !array_key_exists($segment, $current)) {
                 return null;
             }
-            $data = $data[$segment];
+            $current = $current[$segment];
         }
 
-        return $data;
+        return $current;
     }
 }
 ```
