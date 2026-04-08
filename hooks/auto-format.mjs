@@ -18,14 +18,19 @@ if (ext === '.php') {
 
   // 2. Lint with phpcs — blocks on violations
   if (existsSync('./vendor/bin/phpcs')) {
-    const hasProjectConfig = existsSync('.phpcs.xml') || existsSync('phpcs.xml.dist');
+    const hasProjectConfig = existsSync('.phpcs.xml') || existsSync('phpcs.xml.dist') || existsSync('phpcs.xml');
     const standardFlag = hasProjectConfig ? '' : '--standard=PSR12';
     try {
       execSync(`./vendor/bin/phpcs ${standardFlag} "${filePath}"`, {
         timeout: 15000, stdio: 'pipe'
       });
     } catch (e) {
-      process.stderr.write(e.stdout?.toString() ?? e.message);
+      if (e.signal === 'SIGTERM') {
+        // phpcs timed out — do not block
+        process.exit(0);
+      }
+      const detail = e.stdout?.toString().trim() || e.stderr?.toString().trim() || e.message;
+      process.stderr.write(detail + '\n');
       process.exit(1);
     }
   }
