@@ -40,6 +40,10 @@ When scaffolding a resource called `LeaseOffer`:
 app/
   Http/
     Controllers/Api/V1/LeaseOfferController.php
+    Controllers/
+      HealthController.php          (GET /health — no auth, load balancer probe)
+    Controllers/Api/V1/
+      StatusController.php          (GET /api/v1/status — auth required)
     Requests/LeaseOffer/
       IndexLeaseOfferRequest.php
       StoreLeaseOfferRequest.php
@@ -52,10 +56,6 @@ app/
   Repositories/LeaseOfferRepository.php
   Models/LeaseOffer.php
   Resources/LeaseOfferResource.php
-  Controllers/
-    HealthController.php          (GET /health — no auth, load balancer probe)
-  Controllers/Api/V1/
-    StatusController.php          (GET /api/v1/status — auth required)
 routes/
   api.php (add route group)
 tests/
@@ -94,7 +94,10 @@ database/
 ### Step 0: OpenAPI spec
 Check for `docs/openapi/<resource-kebab-case>.yaml`.
 
-If the file does not exist, write it before touching any PHP. Use this template (substitute `<Resource>` and `<resources>` throughout):
+- **File does not exist:** write it using the template below, then present it to the user and wait for approval before proceeding to Step 1.
+- **File already exists:** read it, present it to the user for confirmation, and wait for approval before proceeding to Step 1.
+
+Use this template (substitute `<Resource>` and `<resources>` throughout):
 
 ```yaml
 openapi: "3.1.0"
@@ -141,6 +144,7 @@ paths:
         - { name: id, in: path, required: true, schema: { type: integer } }
       responses:
         "200":
+          description: OK
           content:
             application/json:
               schema: { $ref: "#/components/schemas/<Resource>" }
@@ -157,6 +161,7 @@ paths:
             schema: { $ref: "#/components/schemas/<Resource>Input" }
       responses:
         "200":
+          description: OK
           content:
             application/json:
               schema: { $ref: "#/components/schemas/<Resource>" }
@@ -216,7 +221,7 @@ final class HealthController extends Controller
         return response()->json([
             'status'    => 'ok',
             'timestamp' => now()->toIso8601String(),
-            'version'   => config('app.version', env('APP_VERSION', 'unknown')),
+            'version'   => config('app.version', 'unknown'),
         ]);
     }
 }
@@ -239,7 +244,7 @@ final class StatusController extends Controller
     {
         return response()->json([
             'status'      => 'ok',
-            'version'     => config('app.version', env('APP_VERSION', 'unknown')),
+            'version'     => config('app.version', 'unknown'),
             'environment' => app()->environment(),
         ]);
     }
@@ -278,12 +283,6 @@ class HealthControllerTest extends TestCase
         $response->assertStatus(200)
                  ->assertJsonStructure(['status', 'timestamp', 'version'])
                  ->assertJson(['status' => 'ok']);
-    }
-
-    public function test_health_requires_no_authentication(): void
-    {
-        $response = $this->getJson('/health');
-        $response->assertStatus(200);
     }
 }
 ```
