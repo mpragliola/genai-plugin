@@ -1,0 +1,8 @@
+{
+  "name": "genai-enabler",
+  "description": "Agentic development workflow for PHP/Laravel teams. API scaffolding, Docker, TDD pipeline, AI evaluation, code review, security review, context management. April 2026 best practices.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Marco"
+  }
+}
