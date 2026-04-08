@@ -91,11 +91,20 @@ database/
 
 ## Process
 
-### Step 0: OpenAPI spec
+### Step 0: Testing setup
+
+Check for `behat.yml` in the project root.
+
+- **File absent:** Stop. Output:
+  > "Testing infrastructure not found. Run `/genai-enabler:setup-testing` first, then re-run this scaffold."
+  Do not generate any files.
+- **File present:** proceed to Step 1.
+
+### Step 1: OpenAPI spec
 Check for `docs/openapi/<resource-kebab-case>.yaml`.
 
-- **File does not exist:** write it using the template below, then present it to the user and wait for approval before proceeding to Step 1.
-- **File already exists:** read it, present it to the user for confirmation, and wait for approval before proceeding to Step 1.
+- **File does not exist:** write it using the template below, then present it to the user and wait for approval before proceeding to Step 2.
+- **File already exists:** read it, present it to the user for confirmation, and wait for approval before proceeding to Step 2.
 
 Use this template (substitute `<Resource>` and `<resources>` throughout):
 
@@ -194,12 +203,12 @@ components:
       # add required fields and their types here
 ```
 
-Present the completed spec to the user and wait for approval before proceeding to Step 1.
+Present the completed spec to the user and wait for approval before proceeding to Step 2.
 
-### Step 1: Ask what to scaffold
+### Step 2: Ask what to scaffold
 Use AskUserQuestion: "What resource? What fields? Any special behavior (soft deletes, slugs, search)?"
 
-### Step 2: Plan
+### Step 3: Plan
 List all files that will be created. Wait for approval.
 
 If this is the first resource in the project (i.e. `HealthController` does not yet exist), also scaffold the two standard healthcheck endpoints:
@@ -319,14 +328,14 @@ class StatusControllerTest extends TestCase
 }
 ```
 
-### Step 3: Generate
+### Step 4: Generate
 Create all files following the structure above. Use the examples in this skill's
 `examples/` directory as the reference for code style.
 
-### Step 4: Test
+### Step 5: Test
 Delegate to the **test-writer** agent to create tests for the new resource.
 
-### Step 5: Verify
+### Step 6: Verify
 Run `php artisan test --filter=<Resource>` to confirm everything passes.
 
 ## Reference
