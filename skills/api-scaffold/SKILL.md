@@ -62,10 +62,11 @@ tests/
   Unit/Actions/LeaseOffer/
     CreateLeaseOfferActionTest.php
     ...
-  Feature/Api/V1/
-    LeaseOfferControllerTest.php
+  Feature/
     HealthControllerTest.php
-    Api/V1/StatusControllerTest.php
+    Api/V1/
+      LeaseOfferControllerTest.php
+      StatusControllerTest.php
 database/
   migrations/xxxx_create_lease_offers_table.php
   factories/LeaseOfferFactory.php
