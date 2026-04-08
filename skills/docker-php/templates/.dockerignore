@@ -6,7 +6,6 @@ docker-compose*.yml
 .env
 .env.*
 !.env.example
-tests/
 *.md
 LICENSE
 .github/

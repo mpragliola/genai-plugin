@@ -2,7 +2,7 @@
 # Stages: base → dev → test → prod → worker → scheduler
 
 # --- base: shared foundation ---
-FROM php:8.3-fpm-alpine AS base
+FROM php:8.4-fpm-alpine AS base
 
 RUN apk add --no-cache linux-headers icu-dev libzip-dev oniguruma-dev \
     libpng-dev libjpeg-turbo-dev freetype-dev curl
@@ -26,9 +26,9 @@ EXPOSE 9000
 # --- test: copy source + dev deps, CMD runs tests ---
 FROM base AS test
 COPY composer.json composer.lock ./
-RUN composer install --no-scripts --no-interaction
+RUN composer install --no-scripts --no-autoloader --no-interaction
 COPY . .
-RUN composer dump-autoload
+RUN composer dump-autoload --optimize
 CMD ["php", "vendor/bin/phpunit", "--colors=always"]
 
 # --- prod: no-dev, opcache, non-root, immutable ---
@@ -38,8 +38,10 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist --optimize-autoloader
 COPY . .
 RUN composer dump-autoload --optimize --classmap-authoritative
-# Laravel: uncomment below
-# RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
+# Laravel: route:cache and view:cache are safe here.
+# WARNING: do NOT run config:cache at build time — it bakes env vars into the image.
+#          Run it in an entrypoint script at container startup instead.
+# RUN php artisan route:cache && php artisan view:cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache 2>/dev/null || true
 USER www-data
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

@@ -19,7 +19,7 @@ disable-model-invocation: true
 - In Kubernetes: same pod, separate containers, shared emptyDir volume.
 
 ### Image strategy
-- Base image: `php:8.3-fpm-alpine`. Always alpine. Fewer CVEs, smaller surface.
+- Base image: `php:8.4-fpm-alpine`. Always alpine. Fewer CVEs, smaller surface.
 - Multi-stage Dockerfile with named stages: `base`, `dev`, `test`, `prod`.
 - `dev` stage adds xdebug, pcov. Mounts source via volume. Never copies source.
 - `test` stage copies source + dev dependencies. CMD runs phpunit.
@@ -88,5 +88,8 @@ targets work. Don't over-explain — the developer can read the files.
 - Read `templates/Dockerfile.php` for the multi-stage PHP build.
 - Read `templates/Dockerfile.nginx` for the nginx + asset build.
 - Read `templates/default.conf` for the FastCGI proxy config.
+- Read `templates/php-dev.ini` for dev PHP settings (xdebug, permissive limits).
+- Read `templates/php-prod.ini` for production PHP settings (opcache, JIT, hardening).
 - Read `templates/docker-compose.yml` for the dev environment.
 - Read `templates/docker-compose.prod.yml` for production overrides.
+- Read `templates/docker-compose.test.yml` for CI overrides.

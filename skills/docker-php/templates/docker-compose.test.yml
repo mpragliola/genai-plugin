@@ -4,7 +4,6 @@ services:
   test:
     build: { context: ., dockerfile: docker/php/Dockerfile, target: test }
     environment: [APP_ENV=testing, DB_CONNECTION=sqlite, "DB_DATABASE=:memory:"]
-    depends_on: []
     networks: [app]
 
   mysql:
