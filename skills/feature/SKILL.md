@@ -27,13 +27,29 @@ Switch to Plan mode. If a spec exists in `specs/`, read it. Outline:
 Present plan. Wait for approval.
 
 ### 2. Test (RED)
-Delegate to **test-writer** agent:
-> "Write failing tests for: [feature]. Tests should fail — implementation doesn't exist yet."
 
-Confirm tests are written and failing.
+Delegate to **test-writer** agent with two parallel tasks:
+
+**Task A — Behat (acceptance layer):**
+> "Write failing Behat scenarios for: [feature]. Suite: api.
+>  Run `vendor/bin/behat --suite=api`, confirm all scenarios fail."
+
+**Task B — PHPUnit (unit + feature layer):**
+> "Write failing PHPUnit tests for: [feature].
+>  Run `php artisan test` (Laravel) or `vendor/bin/phpunit` (Symfony/agnostic),
+>  confirm all tests fail."
+
+Do NOT proceed to Step 3 until:
+- All Behat scenarios are written and confirmed failing
+- All PHPUnit tests are written and confirmed failing
+
+Report: "X Behat scenarios written (all failing). Y PHPUnit tests written (all failing)."
 
 ### 3. Implement (GREEN)
-Write minimal code to pass tests. Run test suite to confirm green.
+
+Write minimal code to pass tests. Implementation is complete when BOTH pass:
+- `vendor/bin/behat --suite=api` exits 0
+- `php artisan test` (Laravel) or `vendor/bin/phpunit` (Symfony/agnostic) exits 0
 
 ### 4. Refactor
 - Split methods > 20 lines
