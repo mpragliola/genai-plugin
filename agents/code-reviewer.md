@@ -36,7 +36,8 @@ You are a senior code reviewer. You cannot modify files — only report findings
 
 ### Design quality (SOLID / DRY / KISS / Clean Code)
 - **SRP:** Each class has one reason to change. Flag classes >200 lines as likely SRP violations.
-- **OCP/LSP/ISP/DIP:** No `new` inside business logic (inject dependencies). Interfaces used at domain boundaries where multiple implementations are plausible.
+- **DIP:** No `new` inside business logic (inject dependencies). Interfaces used at domain boundaries where multiple implementations are plausible.
+- **OCP / LSP / ISP:** Require design-level judgment — flag for human review when class hierarchies or interface contracts look suspicious.
 - **DRY:** No copy-paste logic across Action or Repository classes. Shared logic extracted to a dedicated class or trait.
 - **KISS:** No premature abstraction — interfaces with a single implementor, factory classes wrapping a single `new`, unnecessary layers. Flag them.
 - **Clean code:**
